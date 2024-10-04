@@ -29,9 +29,16 @@ namespace TimeSheetAPI.Controllers
         [HttpPost("start")]
         public bool Start([FromBody]Operation op)
         {
-            //Muokataan tietokannassa olevaa WA riviä
+            //haetaan tietokannassa olevaa WA riviä ja tallennetaan tietokantaan
             WorkAssignment? wa = db.WorkAssignments.Find(op.WorkAssignmentID);
 
+            //Jos työtehtävä on käynnissä sitä ei voi aloittaa ja palautetaan false
+            if (wa.InProgress == true)
+            {
+                return (false);
+            }
+
+            //Jos kaikki ok, Muokataan WA riviä
             wa.InProgress = true;
             wa.WorkStartedAt = DateTime.Now.AddHours(1);
             db.SaveChanges();
