@@ -43,7 +43,7 @@ namespace TimeSheetAPI.Controllers
                 StartTime = DateTime.Now.AddHours(1),
                 Active = true,
                 IdEmployee = op.EmployeeID,
-                IdCustomer = wa.IdCustomer
+                IdCustomer = wa.IdCustomer,
                 CreatedAt = DateTime.Now.AddHours(1),
                 Comments = op.Comment
             };
