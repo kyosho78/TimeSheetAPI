@@ -26,7 +26,7 @@ namespace TimeSheetAPI.Controllers
         }
 
         // GET: api/Workassignments/5 START
-        [HttpGet("start")]
+        [HttpPost("start")]
         public bool Start([FromBody]Operation op)
         {
             //Muokataan tietokannassa olevaa WA riviä
