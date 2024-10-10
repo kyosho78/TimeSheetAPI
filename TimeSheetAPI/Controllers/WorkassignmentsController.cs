@@ -17,11 +17,11 @@ namespace TimeSheetAPI.Controllers
             db = context;
         }
 
-        // GET: api/Workassignments
+        // GET: api/Workassignments joita ei ole softdeletattu ja jotka ovat aktiivisia
         [HttpGet]
         public ActionResult GetWorkAssignments()
         {
-            var workAssignments = db.WorkAssignments.Where(w => w.Active == true);
+            var workAssignments = db.WorkAssignments.Where(w => w.Active == true && w.Completed == false);
             return Ok(workAssignments);
         }
 
@@ -56,6 +56,40 @@ namespace TimeSheetAPI.Controllers
             };
 
             db.Timesheets.Add(newEntry);
+
+            db.SaveChanges();
+
+            return (true);
+        }
+
+
+        // GET: api/Workassignments/5 STOP
+        [HttpPost("stop")]
+        public bool Stop([FromBody] Operation op)
+        {
+            //haetaan tietokannassa olevaa WA riviä ja tallennetaan tietokantaan
+            WorkAssignment? wa = db.WorkAssignments.Find(op.WorkAssignmentID);
+
+            //Jos työtehtävä on käynnissä sitä ei voi aloittaa ja palautetaan false
+            if (wa.InProgress == false)
+            {
+                return (false);
+            }
+
+            //Jos kaikki ok, Muokataan WA riviä
+            wa.InProgress = false;
+            wa.Completed = true;
+            wa.CompletedAt = DateTime.Now.AddHours(1);
+            db.SaveChanges();
+
+            //Haetaan Timesheet rivi tietokannasta
+            var ts = db.Timesheets.Where(ts => ts.IdWorkAssignment == op.WorkAssignmentID).FirstOrDefault();
+
+            //Muokataan tarvittavat tiedot
+            ts.StopTime = DateTime.Now.AddHours(1);
+            ts.Comments = op.Comment;
+            ts.LastModifiedAt = DateTime.Now.AddHours(1);
+
 
             db.SaveChanges();
 
